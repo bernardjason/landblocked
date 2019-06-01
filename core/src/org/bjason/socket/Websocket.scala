@@ -14,6 +14,7 @@ import com.badlogic.gdx.Net.{HttpRequest, HttpResponse, HttpResponseListener}
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.JsonWriter.OutputType
+import com.typesafe.config.ConfigFactory
 import org.bjason.gamelogic
 import org.bjason.gamelogic.Controller.ticker
 import org.bjason.gamelogic.Log.info
@@ -57,8 +58,8 @@ object Websocket {
 
   def connect(player: Login) = {
 
-    implicit val system = ActorSystem()
-    //"bern",config)
+    val config = ConfigFactory.load("akka.conf")
+    implicit val system = ActorSystem("bern",config)
     implicit val materializer = ActorMaterializer()
 
     import system.dispatcher

@@ -1,11 +1,28 @@
 # landblocked
 
-poc 2..
+poc 2...
 
-heroku apps:create landedblocked
+Requires server backend landblocked-websocket which is a play framework project that via websocket handles players comms.
 
-https://landedblocked.herokuapp.com/ | https://git.heroku.com/landedblocked.git
+To use that 
 
-git push heroku master
+```touch $HOME/gamelogic_local.txt```
+
+otherwise it will run against Heroku deployment
+
+https://landedblocked.herokuapp.com
+
+```
+./gradlew desktop:run
+```
+
+or for executable
+
+```
+./gradlew desktop:dist
+
+java -jar desktop/build/libs/desktop-1.0.jar
+```
+
 
 

@@ -10,7 +10,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.0'
+        // classpath 'com.android.tools.build:gradle:3.1.0'
         
 
     }
@@ -58,6 +58,7 @@ project(":desktop") {
     }
 }
 
+/*
 project(":android") {
     apply plugin: "android"
 
@@ -95,6 +96,7 @@ project(":android") {
         
     }
 }
+*/
 
 project(":core") {
     apply plugin: "java"

@@ -49,11 +49,12 @@ case class FirstScreen() extends ApplicationAdapter {
       gameName = contents
     }
   }
+
   def writeDefaults = {
     val playerIdFile = Gdx.files.external("._playerid.txt")
-    playerIdFile.writeString(s"${playerId}",false)
+    playerIdFile.writeString(s"${playerId}", false)
     val gameNameFile = Gdx.files.external("._game.txt")
-    gameNameFile.writeString(s"${gameName}",false)
+    gameNameFile.writeString(s"${gameName}", false)
 
   }
 
@@ -68,14 +69,14 @@ case class FirstScreen() extends ApplicationAdapter {
     table.setDebug(true)
     stage.addActor(table)
 
-    val default= gamelogic.GameSetup.defaultFont(30,Color.WHITE)
+    val default = gamelogic.GameSetup.defaultFont(30, Color.WHITE)
     skin.get(classOf[TextButton.TextButtonStyle]).font = default
     skin.get(classOf[TextField.TextFieldStyle]).font = default
 
     val sep = new Label("", skin, "TITLE")
     table.setDebug(false) // This is optional, but enables debug lines for tables.
 
-    val title= gamelogic.GameSetup.getTitle
+    val title = gamelogic.GameSetup.getTitle
 
     table.add(title).colspan(2).align(Align.center).padBottom(20)
     table.row()
@@ -85,7 +86,7 @@ case class FirstScreen() extends ApplicationAdapter {
     val textTable = new Table
     val padding = 10
 
-    val style = new LabelStyle(default,Color.WHITE)
+    val style = new LabelStyle(default, Color.WHITE)
 
     textTable.add(new Label("(Digits only) player id", style)).align((Align.right)).pad(padding)
     val playerIdWidget = if (playerId > 0) new TextField("" + playerId, skin) else new TextField("", skin)
@@ -103,7 +104,7 @@ case class FirstScreen() extends ApplicationAdapter {
     table.add(sep).colspan(2)
     table.row()
 
-    val buttonWidth=100
+    val buttonWidth = 100
     start = new TextButton("Start", skin)
     start.pad(20)
     table.add(start).pad(5).align(Align.right).width(buttonWidth)
@@ -121,8 +122,8 @@ case class FirstScreen() extends ApplicationAdapter {
     val http = s"${Websocket.TESTPROTOCOL}://${Websocket.URL}"
     //val serverAddr = new Label(s"Server $http", skin)
     val serverAddr = new TextButton(s"$http", skin)
-    serverAddr.addListener( new ChangeListener {
-      override def changed(event: ChangeListener.ChangeEvent, actor: Actor): Unit =  {
+    serverAddr.addListener(new ChangeListener {
+      override def changed(event: ChangeListener.ChangeEvent, actor: Actor): Unit = {
         Try {
           Gdx.net.openURI(http)
         }
@@ -134,58 +135,74 @@ case class FirstScreen() extends ApplicationAdapter {
     serverAddr.pad(0)
 
 
-    table.add(new Label("Server address ",skin)).align((Align.right)).colspan(1).pad(0).space(0)
+    table.add(new Label("Server address ", skin)).align((Align.right)).colspan(1).pad(0).space(0)
     table.add(serverAddr).align((Align.bottomLeft)).colspan(2).pad(0).space(0)
     table.row().pad(0).space(0)
 
     table.add(sep).pad(0).space(0)
-    table.add(new Label("Open in default browser",skin)).align((Align.topLeft)).pad(0).space(0)
+    table.add(new Label("Open in default browser", skin)).align((Align.topLeft)).pad(0).space(0)
     table.row().pad(0).space(0)
 
     def startGame = {
+      playerId = -1
+      gameName = null
+      playerIdWidget.setColor(Color.BLACK)
+      gameIdWidget.setColor(Color.BLACK)
+      if (  playerIdWidget.getText.trim.matches("\\d\\d*") ) {
+        playerId = playerIdWidget.getText.trim.toInt
+      }
+      if ( playerId <= 0 ) {
+        playerIdWidget.setColor(Color.RED)
+        playerIdWidget.setMessageText("Int > 0")
+      }
+      if ( gameIdWidget.getText.trim.length > 0 ) {
+        gameName = gameIdWidget.getText.trim
+      } else {
+        gameIdWidget.setColor(Color.RED)
+        gameIdWidget.setMessageText("name pls")
+      }
+
+      if ( playerId > 0 && gameName != null ) {
+        val bar = new ProgressBar(0, 10, 1, false, skin)
+
+        val window = new Window("Loading...", skin)
+        window.setSize(400, 400)
+        window.setPosition(Gdx.graphics.getWidth / 2 - 200, Gdx.graphics.getHeight / 2 - 200)
+        val windowTable = new Table
+        window.add(windowTable)
+        val doingWhat = new Label("Currently doing....", skin)
+        windowTable.add(doingWhat)
+        windowTable.row()
+        windowTable.add(bar)
+        windowTable.row()
+        stage.addActor(window)
 
 
-      val bar = new ProgressBar(0, 10, 1, false, skin)
+        writeDefaults
 
-      val window = new Window("Loading...", skin)
-      window.setSize(400, 400)
-      window.setPosition(Gdx.graphics.getWidth / 2 - 200, Gdx.graphics.getHeight / 2 - 200)
-      val windowTable = new Table
-      window.add(windowTable)
-      val doingWhat = new Label("Currently doing....", skin)
-      windowTable.add(doingWhat)
-      windowTable.row()
-      windowTable.add(bar)
-      windowTable.row()
-      stage.addActor(window)
+        bar.setValue(0)
 
-      playerId = playerIdWidget.getText.trim.toInt
-      gameName = gameIdWidget.getText.trim
+        launchState = 1
 
-      writeDefaults
+        val f = Future {
 
-      bar.setValue(0)
+          for (i <- 1 to 10) {
+            bar.setValue(i)
 
-      launchState = 1
+            Thread.sleep(100)
+          }
 
-      val f = Future {
+        }
+        gamelogic.GameSetup._gameName = gameName
+        gamelogic.GameSetup._playerId = playerId
+        mainGame = new MainGame
 
-        for (i <- 1 to 10) {
-          bar.setValue(i)
-
-          Thread.sleep(100)
+        f.onComplete {
+          case Success(value) => launchState = 3
+          case Failure(e) => e.printStackTrace
         }
 
       }
-      gamelogic.GameSetup._gameName =  gameName
-      gamelogic.GameSetup._playerId = playerId
-      mainGame = new MainGame
-
-      f.onComplete {
-        case Success(value) => launchState = 3
-        case Failure(e) => e.printStackTrace
-      }
-
 
     }
 

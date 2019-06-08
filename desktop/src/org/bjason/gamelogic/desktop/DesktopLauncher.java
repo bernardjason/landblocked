@@ -19,6 +19,7 @@ public class DesktopLauncher {
 
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 
+        /*
         String home = System.getProperty("user.home");
 
         File file = new File(home+"/"+"._playerid.txt");
@@ -46,10 +47,11 @@ public class DesktopLauncher {
         }
 
 
+        */
         config.width = 1024;
         config.height = 800;
 
-        //config.fullscreen = true;
+        config.fullscreen = true;
         GameProxy$ game = GameProxy$.MODULE$;
         game.setAdapter(new FirstScreen());
         LwjglApplication l = new LwjglApplication(game, config);

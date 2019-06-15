@@ -8,7 +8,7 @@ import org.bjason.gamelogic.Log._
 import org.bjason.gamelogic.basic.shape
 import org.bjason.socket.{GameMessage, Websocket}
 
-case class MissileMovement(direction: Vector3, val speed: Float = 150f) extends Movement {
+case class MissileMovement(direction: Vector3, val speed: Float = 250f) extends Movement {
 
   private val translation = new Vector3
   var objectToControl:shape.Basic=null

@@ -133,7 +133,7 @@ object Controller {
     spriteBatch.begin()
 
     for (skyY <- (forSkyY % skyHeight).toInt - skyHeight to (forSkyY % skyHeight).toInt + skyHeight by skyHeight) {
-      for (skyX <- (forSkyX % skyWidth).toInt - skyWidth to (forSkyX % skyWidth).toInt + skyWidth by skyWidth) {
+      for (skyX <- (forSkyX % skyWidth).toInt - skyWidth to (forSkyX % skyWidth).toInt + skyWidth*2 by skyWidth) {
         spriteBatch.draw(skyTexture, skyX, skyHeight - skyY)
       }
     }
